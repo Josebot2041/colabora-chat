@@ -1,10 +1,11 @@
 import { Button, Grid, GridItem, Image } from "@chakra-ui/react";
-import { FaGithub } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import supabase from "../supabaseClient";
 import { ColorModeButton } from "@/components/ui/color-mode";
 
 import { useAppContext } from "../context/appContext";
 import NameForm from "./NameForm";
+
 export default function Header() {
   const { username, setUsername, randomUsername, session } = useAppContext();
 
@@ -54,17 +55,17 @@ export default function Header() {
           <Button
             size="sm"
             marginRight="2"
-            colorScheme="teal"
+            colorScheme="red"
             variant="outline"
             onClick={() =>
               supabase.auth.signInWithOAuth({
-                provider: "github",
+                provider: "google", // Cambiado de "github" a "google"
                 redirectTo: window.location.origin,
               })
             }
-            color="teal"
+            color="red"
           >
-            Login <FaGithub />
+            Login with Gmail <FaGoogle />
           </Button>
         </>
       )}

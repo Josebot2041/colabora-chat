@@ -45,18 +45,21 @@ const AppContextProvider = ({ children }) => {
   const randomUsername = () => {
     return `@user${Date.now().toString().slice(-4)}`;
   };
+
   const initializeUser = (session) => {
     setSession(session);
-    // const {
-    //   data: { session },
-    // } = await supabase.auth.getSession();
 
     let username;
     if (session) {
-      username = session.user.user_metadata.user_name;
+      // CORRECCIÓN: Extraer el username del usuario de Google correctamente
+      username = session.user.user_metadata?.full_name || 
+                 session.user.user_metadata?.user_name || 
+                 session.user.email?.split('@')[0] || 
+                 randomUsername();
     } else {
       username = localStorage.getItem("username") || randomUsername();
     }
+    
     setUsername(username);
     localStorage.setItem("username", username);
   };
@@ -78,13 +81,12 @@ const AppContextProvider = ({ children }) => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("onAuthStateChange", { _event, session });
       initializeUser(session);
+      
+      // Resetear mensajes no vistos cuando hay cambio de sesión
+      if (_event === 'SIGNED_IN') {
+        setUnviewedMessageCount(0);
+      }
     });
-
-    // const { hash, pathname } = window.location;
-    // if (hash && pathname === "/") {
-    //   console.log("hash", hash);
-    //   setRouteHash(hash);
-    // }
 
     return () => {
       // Remove supabase channel subscription by useEffect unmount
