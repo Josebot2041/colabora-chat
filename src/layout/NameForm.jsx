@@ -42,7 +42,7 @@ export default function NameForm() {
         {isEditing ? (
           <Input
             name="username"
-            placeholder="Choose a username"
+            placeholder="Cambia tu nombre"
             onChange={(e) => setNewUsername(e.target.value)}
             value={newUsername}
             bg="black"
