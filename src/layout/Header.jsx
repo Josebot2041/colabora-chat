@@ -1,13 +1,43 @@
 import { Button, Grid, GridItem, Image } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
 import supabase from "../supabaseClient";
-import { ColorModeButton } from "@/components/ui/color-mode";
-
 import { useAppContext } from "../context/appContext";
 import NameForm from "./NameForm";
 
 export default function Header() {
   const { username, setUsername, randomUsername, session } = useAppContext();
+
+  const handleGoogleLogin = async () => {
+    try {
+      // URL de redirección dinámica para producción/desarrollo
+      const isProduction = window.location.hostname !== 'localhost';
+      const redirectTo = isProduction 
+        ? 'https://colabora-chat.vercel.app/'  // URL exacta de producción
+        : 'http://localhost:5173/';            // URL exacta de desarrollo
+
+      console.log('Redirecting to:', redirectTo);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Error logging in with Google:', error);
+        alert('Error al iniciar sesión: ' + error.message);
+        return;
+      }
+    } catch (error) {
+      console.error('Exception during Google login:', error);
+      alert('Error inesperado: ' + error.message);
+    }
+  };
 
   return (
     <Grid
@@ -24,9 +54,7 @@ export default function Header() {
         <Image src="/logo512.png" height="30px" ml="2" />
         <text style={{ color: "white", marginLeft: "10px", fontWeight: "bold"}}>COLABORA CHAT</text>
       </GridItem>
-      {/* <GridItem>
-        <ColorModeButton />
-      </GridItem> */}
+      
       {session ? (
         <>
           <GridItem justifySelf="end" alignSelf="center" mr="4">
@@ -57,12 +85,7 @@ export default function Header() {
             marginRight="2"
             colorScheme="red"
             variant="outline"
-            onClick={() =>
-              supabase.auth.signInWithOAuth({
-                provider: "google", // Cambiado de "github" a "google"
-                redirectTo: window.location.origin,
-              })
-            }
+            onClick={handleGoogleLogin}
             color="red"
           >
             Login with Gmail <FaGoogle />
