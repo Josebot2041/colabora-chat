@@ -45,7 +45,7 @@ export default function NameForm() {
             placeholder="Choose a username"
             onChange={(e) => setNewUsername(e.target.value)}
             value={newUsername}
-            bg="gray.100"
+            bg="black"
             size="sm"
             border="none"
             onBlur={handleSubmit}
