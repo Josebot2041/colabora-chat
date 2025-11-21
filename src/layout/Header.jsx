@@ -9,22 +9,16 @@ export default function Header() {
 
   const handleGoogleLogin = async () => {
     try {
-      // URL de redirección dinámica para producción/desarrollo
-      const isProduction = window.location.hostname !== 'localhost';
-      const redirectTo = isProduction 
-        ? 'https://colabora-chat.vercel.app/'  // URL exacta de producción
-        : 'http://localhost:5173/';            // URL exacta de desarrollo
+      // URL ABSOLUTA para producción - NO dinámica
+      const redirectTo = 'https://colabora-chat.vercel.app/';
 
       console.log('Redirecting to:', redirectTo);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectTo,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
+          skipBrowserRedirect: false
         }
       });
 
@@ -33,6 +27,9 @@ export default function Header() {
         alert('Error al iniciar sesión: ' + error.message);
         return;
       }
+
+      console.log('OAuth data:', data);
+
     } catch (error) {
       console.error('Exception during Google login:', error);
       alert('Error inesperado: ' + error.message);
